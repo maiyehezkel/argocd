@@ -1,0 +1,29 @@
+name: Update Kubernetes Manifests
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  update-manifests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Set Up Kustomize
+        run: |
+          curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh" | bash
+          sudo mv kustomize /usr/local/bin/
+
+      - name: Update Kubernetes Manifests
+        run: |
+          cd path/to/manifests/directory
+          kustomize edit set image my-app=my-app-image:$GITHUB_SHA
+          git add .
+          git commit -m "Update my-app image"
+          git push
+        env:
+          GITHUB_SHA: ${{ github.sha }}
